@@ -131,6 +131,28 @@
 
         .dynamic-list { margin-top: 8px; }
 
+        .qtd-status {
+            font-size: 12px;
+            line-height: 1.3;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        .qtd-status.qtd-status-ativa {
+            color: #1e8449;
+            font-weight: 700;
+        }
+
+        .noscript-aviso {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: #fdf5f5;
+            border-left: 3px solid #d9534f;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #a94442;
+        }
+
         .truck-card {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -563,6 +585,10 @@
 <div class="form-container">
     <h2>Passagem de Turno - Last-Mile</h2>
 
+    <noscript>
+        <div class="noscript-aviso">O JavaScript está desativado neste navegador. Ative-o para gerar as carretas e o relatório.</div>
+    </noscript>
+
     <div class="top-grid">
         <div class="field-block">
             <label for="f_turno">Turno:</label>
@@ -597,11 +623,13 @@
             <div class="sub-title sub-title-rec">Carretas Recebidas</div>
 
             <label for="f_qtd_jt_rec">Qtd de Carretas J&amp;T - Recebidas:</label>
-            <input type="number" id="f_qtd_jt_rec" value="0" min="0" max="99" inputmode="numeric" required oninput="gerarCarretas('rec', 'jt')">
+            <input type="text" id="f_qtd_jt_rec" data-qtd-tipo="rec" data-qtd-empresa="jt" value="0" inputmode="numeric" enterkeyhint="done" pattern="[0-9]*" maxlength="2" autocomplete="off" oninput="atualizarQuantidade(this)" onchange="atualizarQuantidade(this, true)" onblur="finalizarQuantidade(this)" required>
+            <div id="status_rec_jt" class="qtd-status" aria-live="polite"></div>
             <div id="container_rec_jt" class="dynamic-list"></div>
 
             <label for="f_qtd_imile_rec">Qtd de Carretas iMile - Recebidas:</label>
-            <input type="number" id="f_qtd_imile_rec" value="0" min="0" max="99" inputmode="numeric" required oninput="gerarCarretas('rec', 'imile')">
+            <input type="text" id="f_qtd_imile_rec" data-qtd-tipo="rec" data-qtd-empresa="imile" value="0" inputmode="numeric" enterkeyhint="done" pattern="[0-9]*" maxlength="2" autocomplete="off" oninput="atualizarQuantidade(this)" onchange="atualizarQuantidade(this, true)" onblur="finalizarQuantidade(this)" required>
+            <div id="status_rec_imile" class="qtd-status" aria-live="polite"></div>
             <div id="container_rec_imile" class="dynamic-list"></div>
 
             <label for="f_obs_rec">Observações do Recebimento (opcional):</label>
@@ -612,11 +640,13 @@
             <div class="sub-title sub-title-exp">Carretas Expedidas</div>
 
             <label for="f_qtd_jt_exp">Qtd de Carretas J&amp;T - Expedidas:</label>
-            <input type="number" id="f_qtd_jt_exp" value="0" min="0" max="99" inputmode="numeric" required oninput="gerarCarretas('exp', 'jt')">
+            <input type="text" id="f_qtd_jt_exp" data-qtd-tipo="exp" data-qtd-empresa="jt" value="0" inputmode="numeric" enterkeyhint="done" pattern="[0-9]*" maxlength="2" autocomplete="off" oninput="atualizarQuantidade(this)" onchange="atualizarQuantidade(this, true)" onblur="finalizarQuantidade(this)" required>
+            <div id="status_exp_jt" class="qtd-status" aria-live="polite"></div>
             <div id="container_exp_jt" class="dynamic-list"></div>
 
             <label for="f_qtd_imile_exp">Qtd de Carretas iMile - Expedidas:</label>
-            <input type="number" id="f_qtd_imile_exp" value="0" min="0" max="99" inputmode="numeric" required oninput="gerarCarretas('exp', 'imile')">
+            <input type="text" id="f_qtd_imile_exp" data-qtd-tipo="exp" data-qtd-empresa="imile" value="0" inputmode="numeric" enterkeyhint="done" pattern="[0-9]*" maxlength="2" autocomplete="off" oninput="atualizarQuantidade(this)" onchange="atualizarQuantidade(this, true)" onblur="finalizarQuantidade(this)" required>
+            <div id="status_exp_imile" class="qtd-status" aria-live="polite"></div>
             <div id="container_exp_imile" class="dynamic-list"></div>
 
             <label for="f_obs_exp">Observações da Expedição (opcional):</label>
@@ -657,4 +687,684 @@
             </div>
             <div class="rp-summary-item rp-summary-exp">
                 <span class="rp-summary-label">Expedidas</span>
-                <span class="rp-summary-val" id="rp_resumo_exp">0 carretas</spa
+                <span class="rp-summary-val" id="rp_resumo_exp">0 carretas</span>
+            </div>
+        </div>
+
+        <div class="rp-section">
+            <div class="rp-section-title">Last-Mile</div>
+            <div id="rp_desembaraco"></div>
+        </div>
+
+        <div class="rp-section">
+            <div class="rp-section-title rp-title-rec">Carretas Recebidas</div>
+            <div id="rp_recebidas"></div>
+            <div id="rp_obs_rec" class="rp-obs rp-obs-rec"></div>
+        </div>
+
+        <div class="rp-section">
+            <div class="rp-section-title rp-title-exp">Carretas Expedidas</div>
+            <div id="rp_expedidas"></div>
+            <div id="rp_obs_exp" class="rp-obs rp-obs-exp"></div>
+        </div>
+
+        <div class="rp-total">
+            <span>TOTAL EXPEDIDO</span>
+            <span class="rp-total-val" id="rp_total_exp">0 remessas</span>
+        </div>
+    </div>
+</div>
+
+<!-- Prévia da imagem gerada -->
+<div id="previewOverlay" class="preview-overlay" hidden>
+    <div class="preview-modal">
+        <div class="preview-header">Prévia do Relatório</div>
+        <div class="preview-body">
+            <img id="previewImg" alt="Prévia da passagem de turno">
+        </div>
+        <div class="preview-actions">
+            <button type="button" id="btnBaixar">Baixar imagem</button>
+            <button type="button" id="btnCompartilhar" hidden>Compartilhar</button>
+            <button type="button" id="btnFechar" class="secondary">Fechar</button>
+        </div>
+        <div class="preview-hint">No celular, use "Compartilhar" ou toque e segure a imagem para salvar na galeria.</div>
+    </div>
+</div>
+
+<script>
+    const CAMPOS = {
+        rec: [
+            { key: 'placa', label: 'Placa', type: 'text', placeholder: 'Ex: ABC1D23' },
+            { key: 'motorista', label: 'Motorista', type: 'text', placeholder: 'Nome do motorista' },
+            { key: 'laterais', label: 'Laterais', type: 'number', placeholder: 'Qtd', min: 0 },
+            { key: 'base', label: 'Base', type: 'number', placeholder: 'Qtd', min: 0 },
+            { key: 'lacre', label: 'Lacre', type: 'text', placeholder: 'Nº do lacre' },
+            { key: 'horario', label: 'Horário de Recebimento', type: 'time' }
+        ],
+        exp: [
+            { key: 'placa', label: 'Placa', type: 'text', placeholder: 'Ex: ABC1D23' },
+            { key: 'motorista', label: 'Motorista', type: 'text', placeholder: 'Nome do motorista' },
+            { key: 'handover', label: 'Nº do Handover', type: 'text', placeholder: 'Ex: 12345' },
+            { key: 'laterais', label: 'Laterais', type: 'number', placeholder: 'Qtd', min: 0 },
+            { key: 'base', label: 'Base', type: 'number', placeholder: 'Qtd', min: 0 },
+            { key: 'horario', label: 'Horário de Expedição', type: 'time' },
+            { key: 'remessas', label: 'Quantidade de Remessas', type: 'number', placeholder: 'Qtd', min: 0 }
+        ]
+    };
+
+    const NOMES_EMPRESA = { jt: 'J&T', imile: 'iMile' };
+    const formatadorNumero = new Intl.NumberFormat('pt-BR');
+
+    let blobAtual = null;
+    let arquivoAtual = null;
+    let nomeArquivoAtual = '';
+    let urlPreview = null;
+
+    function esc(valor) {
+        return String(valor == null ? '' : valor)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function formatarNumero(valor) {
+        if (valor === '' || valor == null) return '-';
+        const numero = Number(valor);
+        return Number.isFinite(numero) ? formatadorNumero.format(numero) : esc(valor);
+    }
+
+    function horaAgora() {
+        const formatador = new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23'
+        });
+        return formatador.format(new Date());
+    }
+
+    function toggleVisibilidade(idSelect, idAlvo, valorGatilho) {
+        const valor = document.getElementById(idSelect).value;
+        const alvo = document.getElementById(idAlvo);
+        const ativo = valor === valorGatilho;
+
+        alvo.style.display = ativo ? 'block' : 'none';
+        alvo.querySelectorAll('input, select, textarea').forEach(campo => {
+            campo.required = ativo;
+        });
+    }
+
+    function lerValores(container) {
+        return Array.from(container.querySelectorAll('.truck-card')).map(card => {
+            const dados = {};
+            card.querySelectorAll('input').forEach(input => {
+                dados[input.dataset.field] = input.value;
+            });
+            return dados;
+        });
+    }
+
+    function htmlCarreta(tipo, empresa, indice, anteriores) {
+        let html = `<div class="truck-card-title">Carreta ${String(indice + 1).padStart(2, '0')}</div>`;
+
+        CAMPOS[tipo].forEach(campo => {
+            const id = `f_${tipo}_${empresa}_${indice}_${campo.key}`;
+            const valorAnterior = anteriores[indice] ? (anteriores[indice][campo.key] || '') : '';
+            const extras = campo.type === 'number'
+                ? ` min="${campo.min != null ? campo.min : 0}" step="1" inputmode="numeric"`
+                : '';
+            const placeholder = campo.placeholder ? ` placeholder="${esc(campo.placeholder)}"` : '';
+
+            html += `<label for="${id}">${campo.label}</label>`;
+            const input = `<input type="${campo.type}" id="${id}" data-field="${campo.key}"${placeholder} value="${esc(valorAnterior)}" required${extras}>`;
+
+            if (campo.type === 'time') {
+                html += `<div class="time-row">${input}<button type="button" class="btn-agora" data-time-target="${id}">Agora</button></div>`;
+            } else {
+                html += input;
+            }
+        });
+
+        return html;
+    }
+
+    function gerarCarretas(tipo, empresa) {
+        const qtdInput = document.getElementById(`f_qtd_${empresa}_${tipo}`);
+        const valorLimpo = String(qtdInput.value || '').replace(/\D/g, '');
+
+        if (valorLimpo !== qtdInput.value) qtdInput.value = valorLimpo;
+
+        let quantidade = parseInt(valorLimpo, 10);
+        if (!Number.isFinite(quantidade) || quantidade < 0) quantidade = 0;
+        if (quantidade > 99) {
+            quantidade = 99;
+            qtdInput.value = '99';
+        }
+
+        const container = document.getElementById(`container_${tipo}_${empresa}`);
+        const anteriores = lerValores(container);
+        container.innerHTML = '';
+
+        const fragmento = document.createDocumentFragment();
+        for (let i = 0; i < quantidade; i++) {
+            const card = document.createElement('div');
+            card.className = `truck-card truck-card-${tipo}`;
+            card.innerHTML = htmlCarreta(tipo, empresa, i, anteriores);
+            fragmento.appendChild(card);
+        }
+        container.appendChild(fragmento);
+
+        const status = document.getElementById(`status_${tipo}_${empresa}`);
+        if (status) {
+            if (quantidade === 0) {
+                status.textContent = '';
+                status.classList.remove('qtd-status-ativa');
+            } else {
+                status.textContent = quantidade === 1
+                    ? '1 carreta gerada — preencha os dados abaixo.'
+                    : `${quantidade} carretas geradas — preencha os dados abaixo.`;
+                status.classList.add('qtd-status-ativa');
+            }
+        }
+    }
+
+    function atualizarQuantidade(campo, revelar) {
+        const tipo = campo.dataset.qtdTipo;
+        const empresa = campo.dataset.qtdEmpresa;
+        if (!tipo || !empresa) return;
+
+        if (campo.value === campo.dataset.ultimoValor) {
+            if (revelar) {
+                revelarCarretas(tipo, empresa);
+                delete campo.dataset.revelarPendente;
+            }
+            return;
+        }
+
+        gerarCarretas(tipo, empresa);
+        campo.dataset.ultimoValor = campo.value;
+        campo.dataset.revelarPendente = '1';
+
+        if (revelar) {
+            revelarCarretas(tipo, empresa);
+            delete campo.dataset.revelarPendente;
+        }
+    }
+
+    function finalizarQuantidade(campo) {
+        if (campo.value === '') campo.value = '0';
+        atualizarQuantidade(campo, false);
+        campo.dataset.ultimoValor = campo.value;
+
+        if (campo.dataset.revelarPendente === '1') {
+            revelarCarretas(campo.dataset.qtdTipo, campo.dataset.qtdEmpresa);
+            delete campo.dataset.revelarPendente;
+        }
+    }
+
+    function revelarCarretas(tipo, empresa) {
+        if (!tipo || !empresa) return;
+        if (window.matchMedia && !window.matchMedia('(max-width: 899px)').matches) return;
+
+        const container = document.getElementById(`container_${tipo}_${empresa}`);
+        if (!container) return;
+        const primeiro = container.querySelector('.truck-card');
+        if (!primeiro) return;
+
+        const agora = Date.now();
+        const ultima = Number(container.dataset.ultimaRevelacao || 0);
+        if (agora - ultima < 400) return;
+        container.dataset.ultimaRevelacao = String(agora);
+
+        setTimeout(function () {
+            try {
+                primeiro.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (erro) {
+                primeiro.scrollIntoView();
+            }
+        }, 80);
+    }
+
+    function ligarCamposQuantidade() {
+        document.querySelectorAll('[data-qtd-tipo]').forEach(campo => {
+            campo.dataset.ultimoValor = campo.value;
+
+            campo.addEventListener('input', function () { atualizarQuantidade(campo, false); });
+            campo.addEventListener('keyup', function () { atualizarQuantidade(campo, false); });
+            campo.addEventListener('change', function () { atualizarQuantidade(campo, true); });
+            campo.addEventListener('blur', function () { finalizarQuantidade(campo); });
+            campo.addEventListener('focus', function () { campo.select(); });
+        });
+    }
+
+    function coletarCarretas(tipo, empresa) {
+        const container = document.getElementById(`container_${tipo}_${empresa}`);
+        return Array.from(container.querySelectorAll('.truck-card')).map(card => {
+            const dados = {};
+            card.querySelectorAll('input').forEach(input => {
+                dados[input.dataset.field] = input.value.trim();
+            });
+            return dados;
+        });
+    }
+
+    function linha(label, valorHtml) {
+        return `<div class="rp-row"><span class="rp-label">${esc(label)}</span><span class="rp-value">${valorHtml}</span></div>`;
+    }
+
+    function preencherObservacao(idElemento, idCampo, rotulo) {
+        const elemento = document.getElementById(idElemento);
+        const texto = document.getElementById(idCampo).value.trim();
+
+        if (!texto) {
+            elemento.innerHTML = '';
+            elemento.hidden = true;
+            return;
+        }
+
+        elemento.hidden = false;
+        elemento.innerHTML = `<span class="rp-obs-label">${esc(rotulo)}</span>${esc(texto)}`;
+    }
+
+    const COLUNAS_RELATORIO = {
+        rec: [
+            { key: 'indice', label: '#', width: '6%' },
+            { key: 'placa', label: 'Placa', width: '13%', placa: true },
+            { key: 'motorista', label: 'Motorista', width: '22%' },
+            { key: 'lacre', label: 'Lacre', width: '17%' },
+            { key: 'laterais', label: 'Lat', width: '8%', num: true },
+            { key: 'base', label: 'Base', width: '8%', num: true },
+            { key: 'horario', label: 'Hora', width: '12%' },
+            { key: 'spacer', label: '', width: '14%', spacer: true }
+        ],
+        exp: [
+            { key: 'indice', label: '#', width: '6%' },
+            { key: 'placa', label: 'Placa', width: '13%', placa: true },
+            { key: 'motorista', label: 'Motorista', width: '22%' },
+            { key: 'handover', label: 'Handover', width: '17%' },
+            { key: 'laterais', label: 'Lat', width: '8%', num: true },
+            { key: 'base', label: 'Base', width: '8%', num: true },
+            { key: 'horario', label: 'Hora', width: '12%' },
+            { key: 'remessas', label: 'Remessas', width: '14%', num: true }
+        ]
+    };
+
+    function montarTabela(tipo, carretas) {
+        const colunas = COLUNAS_RELATORIO[tipo];
+        let html = `<table class="rp-table rp-table-${tipo}"><colgroup>`;
+        colunas.forEach(coluna => {
+            html += `<col style="width:${coluna.width}">`;
+        });
+        html += '</colgroup><thead><tr>';
+
+        colunas.forEach(coluna => {
+            if (coluna.spacer) return;
+            html += `<th${coluna.num ? ' class="rp-cell-num"' : ''}>${coluna.label}</th>`;
+        });
+
+        html += '</tr></thead><tbody>';
+
+        carretas.forEach((dados, indice) => {
+            html += `<tr${indice % 2 === 1 ? ' class="rp-row-even"' : ''}>`;
+            colunas.forEach(coluna => {
+                if (coluna.spacer) return;
+                let valor;
+                if (coluna.key === 'indice') {
+                    valor = String(indice + 1).padStart(2, '0');
+                } else {
+                    const bruto = dados[coluna.key] || '';
+                    valor = coluna.num
+                        ? (bruto === '' ? '-' : formatarNumero(bruto))
+                        : (bruto || '-');
+                }
+                const classes = [
+                    coluna.num ? 'rp-cell-num' : '',
+                    coluna.placa ? 'rp-cell-placa' : ''
+                ].filter(Boolean).join(' ');
+                html += `<td${classes ? ` class="${classes}"` : ''}>${esc(valor)}</td>`;
+            });
+            html += '</tr>';
+        });
+
+        return html + '</tbody></table>';
+    }
+
+    function montarBlocoEmpresa(tipo, empresa, carretas) {
+        const nome = NOMES_EMPRESA[empresa];
+        const total = carretas.length;
+        const situacao = tipo === 'rec' ? 'recebida' : 'expedida';
+        let html = `<div class="rp-company ${tipo === 'rec' ? 'rp-rec' : 'rp-exp'}"><span>${esc(nome)}</span><span class="rp-company-sub">${total} carreta${total === 1 ? '' : 's'} ${situacao}${total === 1 ? '' : 's'}</span></div>`;
+
+        if (total === 0) {
+            return html + '<div class="rp-empty">Nenhuma carreta registrada.</div>';
+        }
+
+        html += montarTabela(tipo, carretas);
+
+        if (tipo === 'exp') {
+            const subtotal = carretas.reduce((soma, dados) => soma + (parseInt(dados.remessas, 10) || 0), 0);
+            html += `<div class="rp-subtotal">Subtotal ${esc(nome)}: <b>${formatarNumero(subtotal)}</b> remessas</div>`;
+        }
+
+        return html;
+    }
+
+    function preencherRelatorio() {
+        const agora = new Date();
+        const formatadorData = new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            weekday: 'long',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+        const formatadorHora = new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            hour: '2-digit',
+            minute: '2-digit',
+            hourCycle: 'h23'
+        });
+
+        let dataTexto = formatadorData.format(agora);
+        dataTexto = dataTexto.charAt(0).toUpperCase() + dataTexto.slice(1);
+        document.getElementById('rp_data').textContent = `Gerado em ${dataTexto} às ${formatadorHora.format(agora)}`;
+
+        const turno = document.getElementById('f_turno').value;
+        const responsavel = document.getElementById('f_responsavel').value.trim() || 'Não informado';
+        document.getElementById('rp_turno').textContent = turno;
+        document.getElementById('rp_responsavel').textContent = responsavel;
+
+        const desembaraco = document.getElementById('f_desembaraco').value;
+        const detalhe = document.getElementById('f_desembaraco_detalhe').value.trim();
+        let htmlDesembaraco = linha('Problemas com o desembaraço?',
+            desembaraco === 'Sim'
+                ? '<span class="rp-alert">Sim</span>'
+                : '<span class="rp-ok">Não</span>'
+        );
+        if (desembaraco === 'Sim') {
+            htmlDesembaraco += `<div class="rp-detail">${esc(detalhe || 'Nenhum detalhe informado.')}</div>`;
+        }
+        document.getElementById('rp_desembaraco').innerHTML = htmlDesembaraco;
+
+        const recJt = coletarCarretas('rec', 'jt');
+        const recImile = coletarCarretas('rec', 'imile');
+        document.getElementById('rp_recebidas').innerHTML =
+            montarBlocoEmpresa('rec', 'jt', recJt) +
+            montarBlocoEmpresa('rec', 'imile', recImile);
+        preencherObservacao('rp_obs_rec', 'f_obs_rec', 'Observações do Recebimento');
+
+        const expJt = coletarCarretas('exp', 'jt');
+        const expImile = coletarCarretas('exp', 'imile');
+        document.getElementById('rp_expedidas').innerHTML =
+            montarBlocoEmpresa('exp', 'jt', expJt) +
+            montarBlocoEmpresa('exp', 'imile', expImile);
+        preencherObservacao('rp_obs_exp', 'f_obs_exp', 'Observações da Expedição');
+
+        const totalRec = recJt.length + recImile.length;
+        const totalExp = expJt.length + expImile.length;
+        const totalExpedido = expJt.concat(expImile)
+            .reduce((soma, dados) => soma + (parseInt(dados.remessas, 10) || 0), 0);
+
+        document.getElementById('rp_resumo_rec').textContent =
+            `${totalRec} carreta${totalRec === 1 ? '' : 's'} · J&T ${recJt.length} · iMile ${recImile.length}`;
+        document.getElementById('rp_resumo_exp').textContent =
+            `${totalExp} carreta${totalExp === 1 ? '' : 's'} · J&T ${expJt.length} · iMile ${expImile.length} · ${formatarNumero(totalExpedido)} remessas`;
+        document.getElementById('rp_total_exp').textContent = `${formatarNumero(totalExpedido)} remessas`;
+
+        return { turno, responsavel };
+    }
+
+    async function carregarFontes() {
+        if (!document.fonts) return;
+
+        const carregamento = (async () => {
+            try {
+                await Promise.all([
+                    document.fonts.load('400 12px Inter'),
+                    document.fonts.load('600 12px Inter'),
+                    document.fonts.load('700 12px Inter')
+                ]);
+                await document.fonts.ready;
+            } catch (erro) {
+                console.warn('Não foi possível pré-carregar as fontes:', erro);
+            }
+        })();
+
+        // Se a fonte não carregar (ex: sem internet), segue com a fonte de fallback.
+        const limite = new Promise(resolve => setTimeout(resolve, 4000));
+        await Promise.race([carregamento, limite]);
+    }
+
+    function esperarRenderizacao() {
+        return new Promise(resolve => {
+            requestAnimationFrame(() => requestAnimationFrame(resolve));
+        });
+    }
+
+    function canvasParaBlob(canvas) {
+        return new Promise((resolve, reject) => {
+            canvas.toBlob(blob => {
+                if (blob) resolve(blob);
+                else reject(new Error('Falha ao converter a imagem.'));
+            }, 'image/png');
+        });
+    }
+
+    function nomeDoArquivo(turno) {
+        const agora = new Date();
+        const doisDigitos = n => String(n).padStart(2, '0');
+        const data = `${agora.getFullYear()}-${doisDigitos(agora.getMonth() + 1)}-${doisDigitos(agora.getDate())}`;
+        const hora = `${doisDigitos(agora.getHours())}-${doisDigitos(agora.getMinutes())}`;
+        const turnoLimpo = turno.replace(/[^\w\-]+/g, ' ').trim();
+        return `Passagem de Turno Last-Mile - ${turnoLimpo} - ${data} ${hora}.png`;
+    }
+
+    function podeCompartilharArquivo(arquivo) {
+        try {
+            return !!(navigator.share && navigator.canShare && navigator.canShare({ files: [arquivo] }));
+        } catch (erro) {
+            return false;
+        }
+    }
+
+    function abrirPreview(blob, nome, arquivo) {
+        if (urlPreview) URL.revokeObjectURL(urlPreview);
+        urlPreview = URL.createObjectURL(blob);
+
+        document.getElementById('previewImg').src = urlPreview;
+        document.getElementById('btnCompartilhar').hidden = !podeCompartilharArquivo(arquivo);
+        document.getElementById('previewOverlay').hidden = false;
+    }
+
+    function fecharPreview() {
+        document.getElementById('previewOverlay').hidden = true;
+    }
+
+    function validarFormulario() {
+        const form = document.querySelector('.form-container');
+        const campos = document.querySelectorAll('.form-container input[required], .form-container select[required], .form-container textarea[required]');
+        let primeiroInvalido = null;
+
+        campos.forEach(campo => {
+            const textoLivre = campo.tagName === 'TEXTAREA' || campo.type === 'text' || campo.type === 'search';
+            campo.setCustomValidity(textoLivre && !campo.value.trim() ? 'Preencha este campo.' : '');
+
+            if (!campo.checkValidity() && !primeiroInvalido) {
+                primeiroInvalido = campo;
+            }
+        });
+
+        if (!primeiroInvalido) {
+            form.classList.remove('validacao-ativa');
+            return true;
+        }
+
+        form.classList.add('validacao-ativa');
+        primeiroInvalido.reportValidity();
+        primeiroInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        try {
+            primeiroInvalido.focus({ preventScroll: true });
+        } catch (erro) {
+            primeiroInvalido.focus();
+        }
+        return false;
+    }
+
+    function limparFormulario() {
+        if (!confirm('Limpar todos os dados do formulário?')) return;
+
+        const form = document.querySelector('.form-container');
+        form.querySelectorAll('input, select, textarea').forEach(campo => {
+            if (campo.id && campo.id.indexOf('f_qtd_') === 0) {
+                campo.value = '0';
+            } else if (campo.tagName === 'SELECT') {
+                campo.selectedIndex = 0;
+            } else {
+                campo.value = '';
+            }
+        });
+
+        ['rec', 'exp'].forEach(tipo => {
+            ['jt', 'imile'].forEach(empresa => {
+                document.getElementById(`container_${tipo}_${empresa}`).innerHTML = '';
+            });
+        });
+
+        document.querySelectorAll('[data-qtd-tipo]').forEach(campo => {
+            campo.dataset.ultimoValor = campo.value;
+            delete campo.dataset.revelarPendente;
+        });
+
+        document.querySelectorAll('.qtd-status').forEach(status => {
+            status.textContent = '';
+            status.classList.remove('qtd-status-ativa');
+        });
+
+        form.classList.remove('validacao-ativa');
+        toggleVisibilidade('f_desembaraco', 'box_desembaraco', 'Sim');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function processarRelatorio() {
+        if (!validarFormulario()) return;
+
+        const botao = document.getElementById('btnGerar');
+        botao.disabled = true;
+        botao.textContent = 'Gerando...';
+
+        try {
+            const { turno } = preencherRelatorio();
+
+            await carregarFontes();
+            await esperarRenderizacao();
+
+            const canvas = await html2canvas(document.getElementById('canvasArea'), {
+                scale: 2,
+                backgroundColor: '#ffffff',
+                useCORS: true,
+                allowTaint: true,
+                logging: false,
+                width: 640,
+                windowWidth: 640,
+                scrollX: 0,
+                scrollY: 0,
+                onclone: function (documentoClonado) {
+                    const wrapper = documentoClonado.getElementById('canvasWrapper');
+                    if (wrapper) {
+                        wrapper.style.position = 'fixed';
+                        wrapper.style.left = '0';
+                        wrapper.style.top = '0';
+                        wrapper.style.width = '640px';
+                        wrapper.style.height = 'auto';
+                        wrapper.style.overflow = 'visible';
+                        wrapper.style.visibility = 'visible';
+                        wrapper.style.zIndex = '2147483647';
+                    }
+                    const area = documentoClonado.getElementById('canvasArea');
+                    if (area) area.style.width = '640px';
+                }
+            });
+
+            blobAtual = await canvasParaBlob(canvas);
+            nomeArquivoAtual = nomeDoArquivo(turno);
+            arquivoAtual = new File([blobAtual], nomeArquivoAtual, { type: 'image/png' });
+
+            abrirPreview(blobAtual, nomeArquivoAtual, arquivoAtual);
+        } catch (erro) {
+            console.error(erro);
+            alert('Não foi possível gerar a imagem do relatório. Tente novamente.');
+        } finally {
+            botao.disabled = false;
+            botao.textContent = 'Gerar Relatório de Turno';
+        }
+    }
+
+    function baixarImagem() {
+        if (!blobAtual) return;
+        const url = URL.createObjectURL(blobAtual);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = nomeArquivoAtual;
+        link.rel = 'noopener';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    async function compartilharImagem() {
+        if (!arquivoAtual) return;
+        try {
+            await navigator.share({
+                files: [arquivoAtual],
+                title: 'Passagem de Turno - Last-Mile',
+                text: `Passagem de turno ${document.getElementById('f_turno').value}`
+            });
+        } catch (erro) {
+            if (erro && erro.name !== 'AbortError') {
+                console.warn('Compartilhamento não concluído:', erro);
+            }
+        }
+    }
+
+    document.getElementById('btnGerar').addEventListener('click', processarRelatorio);
+    document.getElementById('btnLimpar').addEventListener('click', limparFormulario);
+    document.getElementById('btnBaixar').addEventListener('click', baixarImagem);
+    document.getElementById('btnCompartilhar').addEventListener('click', compartilharImagem);
+    document.getElementById('btnFechar').addEventListener('click', fecharPreview);
+
+    document.querySelector('.form-container').addEventListener('input', function (evento) {
+        const campo = evento.target;
+        if (campo.dataset && campo.dataset.field === 'placa' && campo.value !== campo.value.toUpperCase()) {
+            const inicio = campo.selectionStart;
+            const fim = campo.selectionEnd;
+            campo.value = campo.value.toUpperCase();
+            try { campo.setSelectionRange(inicio, fim); } catch (erro) {}
+        }
+    });
+
+    document.querySelector('.form-container').addEventListener('click', function (evento) {
+        const botao = evento.target.closest('.btn-agora');
+        if (!botao) return;
+
+        const alvo = document.getElementById(botao.dataset.timeTarget);
+        if (!alvo) return;
+
+        alvo.value = horaAgora();
+        alvo.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    document.getElementById('previewOverlay').addEventListener('click', function (evento) {
+        if (evento.target === this) fecharPreview();
+    });
+    document.addEventListener('keydown', function (evento) {
+        if (evento.key === 'Escape') fecharPreview();
+    });
+
+    ligarCamposQuantidade();
+    toggleVisibilidade('f_desembaraco', 'box_desembaraco', 'Sim');
+</script>
+
+</body>
+</html>
